@@ -4,7 +4,7 @@ Library.
 """
 
 import numpy as np
-import misc as mi
+from . import misc as mi
 
 def r_hermite(N):
     """Recurrence coefficients for the Hermite orthogonal polynomials.
@@ -30,7 +30,7 @@ def r_hermite(N):
     https://www.cs.purdue.edu/archives/2002/wxg/codes/OPQ.html.
     """
 
-    if not isinstance(N, int):
+    if not isinstance(N, (int, np.integer)):
         raise TypeError('N must be an int')
 
     if N <= 0:
@@ -77,7 +77,7 @@ def r_jacobi(N,l,r,a,b):
     https://www.cs.purdue.edu/archives/2002/wxg/codes/OPQ.html.
     """
 
-    if not isinstance(N, int):
+    if not isinstance(N, (int, np.integer)):
         raise TypeError('N must be an int')
 
     if N <= 0:
@@ -266,7 +266,7 @@ def gauss_hermite(N):
     https://www.cs.purdue.edu/archives/2002/wxg/codes/OPQ.html.
     """
 
-    if isinstance(N, int):
+    if isinstance(N, (int, np.integer)):
         N = [N]
 
     if type(N) is not list:
@@ -309,7 +309,7 @@ def gauss_legendre(N):
     https://www.cs.purdue.edu/archives/2002/wxg/codes/OPQ.html.
     """
 
-    if isinstance(N, int):
+    if isinstance(N, (int, np.integer)):
         N = [N]
 
     if type(N) is not list:

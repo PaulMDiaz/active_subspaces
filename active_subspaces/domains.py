@@ -1,10 +1,10 @@
 """Utilities for building the domains and maps for active variables."""
 import numpy as np
-from utils.misc import process_inputs, BoundedNormalizer
+from .utils.misc import process_inputs, BoundedNormalizer
 from scipy.spatial import ConvexHull
-from scipy.misc import comb
-from utils.qp_solver import QPSolver
-from subspaces import Subspaces
+from scipy.special import comb
+from .utils.qp_solver import QPSolver
+from .subspaces import Subspaces
 
 class ActiveVariableDomain():
     """A base class for the domain of functions of active variables.
@@ -116,7 +116,7 @@ class BoundedActiveVariableDomain(ActiveVariableDomain):
             convhull = None
             constraints = None
         else:
-	    Y, X = zonotope_vertices(W1)
+            Y, X = zonotope_vertices(W1)
             convhull = ConvexHull(Y)
             A = convhull.equations[:,:n]
             b = convhull.equations[:,n]
@@ -210,7 +210,7 @@ class ActiveVariableMap():
         # check inputs
         Y, NY, n = process_inputs(Y)
 
-        if not isinstance(N, int):
+        if not isinstance(N, (int, np.integer)):
             raise TypeError('N must be an int')
 
         Z = self.regularize_z(Y, N)
@@ -356,10 +356,10 @@ def nzv(m, n):
     N : int 
         the number of vertices defining the zonotope
     """
-    if not isinstance(m, int):
+    if not isinstance(m, (int, np.integer)):
         raise TypeError('m should be an integer.')
 
-    if not isinstance(n, int):
+    if not isinstance(n, (int, np.integer)):
         raise TypeError('n should be an integer.')
 
     # number of zonotope vertices
@@ -468,8 +468,8 @@ def zonotope_vertices(W1, Nsamples=10000, maxcount=100000):
     
     numverts = X.shape[0]
     if totalverts > numverts:
-        print 'Warning: {} of {} vertices found.'.format(numverts, totalverts)
-    
+        print('Warning: {} of {} vertices found.'.format(numverts, totalverts))
+
     Y = np.dot(X, W1)
     return Y.reshape((numverts, n)), X.reshape((numverts, m))
     
@@ -521,7 +521,7 @@ def sample_z(N, y, W1, W2):
     Gleich for showing me Chebyshev centers.
 
     """
-    if not isinstance(N, int):
+    if not isinstance(N, (int, np.integer)):
         raise TypeError('N should be an integer.')
 
     Z = rejection_sampling_z(N, y, W1, W2)
