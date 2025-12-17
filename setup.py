@@ -1,11 +1,11 @@
 from setuptools import setup
 
 def readme():
-    with open('README.rst') as f:
+    with open('README.md') as f:
         return f.read()
 
 setup(name='active_subspaces',
-      version='0.1.1',
+      version='0.1',
       description='Tools to apply active subspaces to analyze models and data.',
       long_description=readme(),
       classifiers=[

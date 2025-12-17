@@ -1,24 +1,36 @@
 """Utilities for approximating gradients."""
 import numpy as np
-import logging
 from utils.misc import process_inputs
 from utils.simrunners import SimulationRunner
 
-def local_linear_gradients(X, f, p=None):
-    """
-    Estimate a collection of gradients from input/output pairs.
+def local_linear_gradients(X, f, p=None, weights=None):
+    """Estimate a collection of gradients from input/output pairs.
+    
+    Given a set of input/output pairs, choose subsets of neighboring points and
+    build a local linear model for each subset. The gradients of these local
+    linear models comprise estimates of sampled gradients.
 
-    :param ndarray X: M-by-m matrix that contains the m-dimensional inputs.
-    :param ndarray f: M-by-1 matrix that contains scalar outputs.
-    :param int p: How many nearest neighbors to use when constructing the
-        local linear model.
+    Parameters
+    ----------
+    X : ndarray 
+        M-by-m matrix that contains the m-dimensional inputs
+    f : ndarray 
+        M-by-1 matrix that contains scalar outputs
+    p : int, optional
+        how many nearest neighbors to use when constructing the local linear 
+        model (default 1)
+    weights : ndarray, optional
+        M-by-1 matrix that contains the weights for each observation (default 
+        None)
 
-    :return df: M-by-m matrix that contains estimated partial derivatives
-        approximated by the local linear models.
-    :rtype: ndarray
+    Returns
+    -------
+    df : ndarray
+        M-by-m matrix that contains estimated partial derivatives approximated 
+        by the local linear models
 
-    **Notes**
-
+    Notes
+    -----
     If `p` is not specified, the default value is floor(1.7*m).
     """
 
@@ -32,35 +44,44 @@ def local_linear_gradients(X, f, p=None):
 
     if p < m+1 or p > M:
         raise Exception('p must be between m+1 and M')
+        
+    if weights is None:
+        weights = np.ones((M, 1)) / M
 
     MM = np.minimum(int(np.ceil(10*m*np.log(m))), M-1)
-    logging.getLogger(__name__).debug('Computing {:d} local linear approximations with {:d} points in {:d} dims.'.format(MM, M, m))
     df = np.zeros((MM, m))
     for i in range(MM):
         ii = np.random.randint(M)
         x = X[ii,:]
-        ind = np.argsort(np.sum((X - x)**2, axis=1))
-        A = np.hstack((np.ones((p,1)), X[ind[1:p+1],:]))
-        u = np.linalg.lstsq(A, f[ind[1:p+1]])[0]
+        D2 = np.sum((X - x)**2, axis=1)
+        ind = np.argsort(D2)
+        ind = ind[D2 != 0]
+        A = np.hstack((np.ones((p,1)), X[ind[:p],:])) * np.sqrt(weights[ii])
+        b = f[ind[:p]] * np.sqrt(weights[ii])
+        u = np.linalg.lstsq(A, b)[0]
         df[i,:] = u[1:].T
     return df
 
 def finite_difference_gradients(X, fun, h=1e-6):
-    """
-    Compute finite difference gradients with a given interface.
+    """Compute finite difference gradients with a given interface.
 
-    :param ndarray X: M-by-m matrix that contains the points to estimate the
-        gradients with finite differences.
-    :param function fun: Function that returns the simulation's quantity of
-        interest given inputs.
-    :param float h: The finite difference step size.
+    Parameters
+    ----------
+    X : ndarray 
+        M-by-m matrix that contains the points to estimate the gradients with 
+        finite differences
+    fun : function
+        function that returns the simulation's quantity of interest given inputs
+    h : float, optional 
+        the finite difference step size (default 1e-6)
 
-    :return: df, M-by-m matrix that contains estimated partial derivatives
-        approximated by finite differences
-    :rtype: ndarray
+    Returns
+    -------
+    df : ndarray 
+        M-by-m matrix that contains estimated partial derivatives approximated 
+        by finite differences
     """
     X, M, m = process_inputs(X)
-    logging.getLogger(__name__).debug('Computing finite diff grads at {:d} points in {:d} dims.'.format(M, m))
 
     # points to run simulations including the perturbed inputs
     XX = np.kron(np.ones((m+1, 1)),X) + \
