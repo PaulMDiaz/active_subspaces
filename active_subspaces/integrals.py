@@ -1,13 +1,13 @@
 """Utilities for exploiting active subspaces when estimating integrals."""
 
 import numpy as np
-import utils.quadrature as gq
-from utils.misc import conditional_expectations
-from utils.designs import maximin_design
-from utils.simrunners import SimulationRunner
-from domains import UnboundedActiveVariableDomain, BoundedActiveVariableDomain, \
+from .utils import quadrature as gq
+from .utils.misc import conditional_expectations
+from .utils.designs import maximin_design
+from .utils.simrunners import SimulationRunner
+from .domains import UnboundedActiveVariableDomain, BoundedActiveVariableDomain, \
                     ActiveVariableMap
-from response_surfaces import ActiveSubspaceResponseSurface
+from .response_surfaces import ActiveSubspaceResponseSurface
 from scipy.spatial import Delaunay
 
 def integrate(fun, avmap, N, NMC=10):
@@ -51,7 +51,7 @@ def integrate(fun, avmap, N, NMC=10):
     if not isinstance(avmap, ActiveVariableMap):
         raise TypeError('avmap should be an ActiveVariableMap.')
 
-    if not isinstance(N, int):
+    if not isinstance(N, (int, np.integer)):
         raise TypeError('N should be an integer')
 
     # get the quadrature rule
@@ -104,7 +104,7 @@ def av_integrate(avfun, avmap, N):
     if not isinstance(avmap, ActiveVariableMap):
         raise TypeError('avmap should be an ActiveVariableMap.')
 
-    if not isinstance(N, int):
+    if not isinstance(N, (int, np.integer)):
         raise TypeError('N should be an integer.')
 
     Yp, Yw = av_quadrature_rule(avmap, N)
@@ -163,10 +163,10 @@ def quadrature_rule(avmap, N, NMC=10):
     if not isinstance(avmap, ActiveVariableMap):
         raise TypeError('avmap should be an ActiveVariableMap.')
 
-    if not isinstance(N, int):
+    if not isinstance(N, (int, np.integer)):
         raise TypeError('N should be an integer.')
 
-    if not isinstance(NMC, int):
+    if not isinstance(NMC, (int, np.integer)):
         raise TypeError('NMC should be an integer.')
 
     # get quadrature rule on active variables

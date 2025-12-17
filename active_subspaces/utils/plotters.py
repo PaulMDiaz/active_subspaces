@@ -374,18 +374,20 @@ def sufficient_summary(y, f, out_label=None, opts=None):
 
     if n==2:
 
-        plt.figure(figsize=(7,7))
+        fig = plt.figure(figsize=(7,7))
+        ax = fig.add_subplot(111)
         plt.rc('font', **opts['myfont'])
-        plt.scatter(y1, y2, c=f, s=150.0, vmin=np.min(f), vmax=np.max(f))
-        plt.xlabel('Active variable 1')
-        plt.ylabel('Active variable 2')
+        sc = ax.scatter(y1, y2, c=f, s=150.0, vmin=np.min(f), vmax=np.max(f))
+        ax.set_xlabel('Active variable 1')
+        ax.set_ylabel('Active variable 2')
         ymin = 1.1*np.amin([np.amin(y1), np.amin(y2)])
         ymax = 1.1*np.amax([np.amax(y1), np.amax(y2)])
-        plt.axis([ymin, ymax, ymin, ymax])
-        plt.axes().set_aspect('equal')
-        plt.grid(True)
-        plt.title(out_label)
-        plt.colorbar()
+        ax.set_xlim(ymin, ymax)
+        ax.set_ylim(ymin, ymax)
+        ax.set_aspect('equal')
+        ax.grid(True)
+        ax.set_title(out_label)
+        plt.colorbar(sc)
         if opts['savefigs']:
             figname = 'figs/ssp2_' + out_label + opts['figtype']
             plt.savefig(figname, dpi=300, bbox_inches='tight', pad_inches=0.0)
@@ -462,17 +464,17 @@ def zonotope_2d_plot(vertices, design=None, y=None, f=None, out_label=None, opts
     fig0 = convex_hull_plot_2d(ch, ax=ax)
     for l in fig0.axes[0].get_children():
         if type(l) is Line2D:
-	        l.set_linewidth(3)
+            l.set_linewidth(3)
 
     if design is not None:
         fig1 = delaunay_plot_2d(dtri, ax=ax)
         for l in fig1.axes[0].get_children():
             if type(l) is Line2D:
-	        l.set_color('0.75')
+                l.set_color('0.75')
 
     if y is not None:
         plt.scatter(y[:,0], y[:,1], c=f, s=100.0, vmin=np.min(f), vmax=np.max(f))
-        plt.axes().set_aspect('equal')
+        plt.gca().set_aspect('equal')
         plt.title(out_label)
         plt.colorbar()
 

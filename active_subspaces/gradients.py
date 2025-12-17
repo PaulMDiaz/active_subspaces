@@ -1,7 +1,7 @@
 """Utilities for approximating gradients."""
 import numpy as np
-from utils.misc import process_inputs
-from utils.simrunners import SimulationRunner
+from .utils.misc import process_inputs
+from .utils.simrunners import SimulationRunner
 
 def local_linear_gradients(X, f, p=None, weights=None):
     """Estimate a collection of gradients from input/output pairs.
@@ -39,7 +39,7 @@ def local_linear_gradients(X, f, p=None, weights=None):
 
     if p is None:
         p = int(np.minimum(np.floor(1.7*m), M))
-    elif not isinstance(p, int):
+    elif not isinstance(p, (int, np.integer)):
         raise TypeError('p must be an integer.')
 
     if p < m+1 or p > M:
